@@ -143,9 +143,9 @@ set smartcase
 " GUI font
 
 if g:iswindows == 1
-    "set guifont=Monospace\ 12
+    set guifont=Monospace\ 10
     "set guifont=Envy_Code_R_VS:h12:cANSI
-    set guifont=Courier_New:h10:cANSI
+    "set guifont=Courier_New:h10:cANSI
 endif
 
 filetype plugin indent on "Auto completion
@@ -719,7 +719,7 @@ Plugin 'mkarmona/colorsbox'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'kshenoy/vim-signature'
 Plugin 'tpope/vim-speeddating'
-Plugin 'jceb/vim-orgmode'
+"Plugin 'jceb/vim-orgmode'
 Plugin 'Yggdroot/indentLine'
 "Plugin 'vim-scripts/YankRing.vim'
 Plugin 'tpope/vim-fugitive'
@@ -886,7 +886,7 @@ nmap <leader>p :CtrlP<cr>
 " Easy bindings for its various modes
 nmap <leader>bb :CtrlPBuffer<cr>
 nmap <leader>bm :CtrlPMixed<cr>
-nmap <leader>bs :CtrlPMRU<cr>
+"nmap <leader>bs :CtrlPMRU<cr>
 " ***************************************************
 "           scrooloose/nerdtree
 " ***************************************************
@@ -962,8 +962,8 @@ let g:DoxygenToolkit_briefTag_funcName = "yes"
 let g:DoxygenToolkit_briefTag_pre="@brief  "
 let g:DoxygenToolkit_paramTag_pre="@param "
 let g:DoxygenToolkit_returnTag="@return   "
-"let g:DoxygenToolkit_blockHeader="--------------------------------------------------------------------------"
-"let g:DoxygenToolkit_blockFooter="--------------------------------------------------------------------------"
+let g:DoxygenToolkit_blockHeader="--------------------------------------------------------------------------"
+let g:DoxygenToolkit_blockFooter="--------------------------------------------------------------------------"
 "let g:DoxygenToolkit_authorName="Huang Kangying"
 "let g:DoxygenToolkit_licenseTag="My own license"
 
@@ -976,7 +976,9 @@ let g:DoxygenToolkit_returnTag="@return   "
 " ***************************************************
 "           vim-scripts/mru.vim
 " ***************************************************
-nnoremap <leader>mr :Mru<cr>
+"nnoremap <leader>mr :Mru<cr>
+nnoremap <leader>bs :Mru<cr>
+let MRU_Auto_Close = 1
 
 " ***************************************************
 "           junegunn/vim-easy-align
@@ -1020,11 +1022,11 @@ let g:airline_section_z = '[0x%B] [%l, %c]'
 
 " Use the fancy font if installed Consolas font in windows
 " For compatibility, don't use powerline fonts
-let g:use_power_line_fonts = 0
+let g:use_power_line_fonts = 1
 if g:iswindows == 1
     if g:use_power_line_fonts == 1
         let g:airline_powerline_fonts = 1
-        set guifont=Consolas\ for\ Powerline\ FixedD:h11
+        set guifont=Consolas\ for\ Powerline\ FixedD:h10
         let g:Powerline_symbols="fancy"
         if !exists('g:airline_symbols')
             let g:airline_symbols = {}

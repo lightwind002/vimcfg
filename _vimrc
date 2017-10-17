@@ -26,9 +26,6 @@ source $VIMRUNTIME/mswin.vim
 behave mswin
 set bomb
 
-" The default 20 isn't nearly enough
-set history=9999
-
 "
 " Setup folder structure
 "
@@ -148,9 +145,9 @@ if g:iswindows == 1
     "set guifont=Courier_New:h10:cANSI
 endif
 
-filetype plugin indent on "Auto completion
+filetype plugin indent on " Auto completion
 set autoindent
-set nocp  " Close Vi compatible mode
+set nocp                  " Close Vi compatible mode
 set completeopt=longest,menu
 
 
@@ -422,7 +419,7 @@ function! CreateCscope()
     endif
     if(executable('cscope') && has("cscope") )
         if(g:iswindows==1)
-            silent! execute "!dir /s/b *.c,*.cpp,*.h,*.asm,*.S,*.inc,"
+            silent! execute "!dir /s/b *.c,*.cpp,*.h,*.hpp,*.cc,*.asm,*.S,*.inc,"
                         \"*.java,*.cs,*.py,*.php,"
                         \"*.asl,*.asi,"
                         \"*.dec,*.dsc,*.inf,*.fdf,"
@@ -430,10 +427,12 @@ function! CreateCscope()
                         \"*.hfr,*.hfi,*.vfr,*.vfi > cscope.files"
         else
             silent! execute "!find ".dir." -name '*.h' "
+                        \"-o -name '*.hpp' "
                         \"-o -name '*.c' "
                         \"-o -name '*.asm' "
                         \"-o -name '*.S' "
                         \"-o -name '*.cpp' "
+                        \"-o -name '*.cc' "
                         \"-o -name '*.php' "
                         \"-o -name '*.java' "
                         \"-o -name '*.cs' > cscope.files"
@@ -458,7 +457,23 @@ endfunction
 
 " Generate ctags
 function! CreateCtags()
-    let dir = getcwd()
+    let dir       = getcwd()
+    let save_path = getcwd()
+    let last_path = ""
+    let cur_path  = getcwd()
+    " Assume that '.git' is the root path, try to find it
+    " If can't find, use the previous working path 
+    while last_path != cur_path
+        if isdirectory(".git")
+            let dir = cur_path
+            break
+        endif
+        let last_path = cur_path
+        silent! execute "lcd .."
+        let cur_path = getcwd()
+    endwhile
+    " Switch to the directory to run cscope
+    silent! execute 'cd ' . dir
     if filereadable("tags")
         if(g:iswindows==1)
             let tagsdeleted=delete(dir."\\"."tags")
@@ -479,6 +494,11 @@ function! CreateCtags()
                 \ '--exclude=*.bin '
                 \ '--exclude=*.obj '
                 \ '--exclude=*.efi'
+                \ '--exclude=*.txt'
+                \ '--exclude=*.dll'
+                \ '--exclude=*.lib'
+                \ '--exclude=*.so'
+                \ '--exclude=*.so.*'
                 \ '--extra=+q .'
                 \ ' & vim --servername '.v:servername.' --remote-expr "AddCtags()"'
                 \ ' "'
@@ -487,11 +507,16 @@ function! CreateCtags()
                         \"--exclude=.git "
                         \"--exclude=*.exe "
                         \"--exclude=*.bin "
+                        \ '--exclude=*.txt'
+                        \ '--exclude=*.dll'
+                        \ '--exclude=*.lib'
+                        \ '--exclude=*.so'
                         \"--exclude=*.obj "
                         \"--extra=+q ."
             call AddCtags()
         endif
     endif
+    silent! execute 'cd ' . save_path
 endfunction
 
 
@@ -701,7 +726,7 @@ Plugin 'mbbill/echofunc'
 "Plugin 'Shougo/neocomplcache.vim'
 Plugin 'ervandew/supertab'
 Plugin 'kien/ctrlp.vim'
-Plugin 'vim-scripts/mru.vim'
+"Plugin 'vim-scripts/mru.vim'
 Plugin 'bling/vim-airline'
 Plugin 'vim-scripts/DirDiff.vim'
 Plugin 'oplatek/Conque-Shell'
@@ -725,6 +750,8 @@ Plugin 'Yggdroot/indentLine'
 Plugin 'tpope/vim-fugitive'
 Plugin 'Valloric/YouCompleteMe'
 "Plugin 'stevearc/vim-arduino'
+Plugin 'gregsexton/gitv'
+Plugin 'terryma/vim-smooth-scroll'
 Plugin 'file://~/.vim/bundle/myplugin'
 
 " All of your Plugins must be added before the following line
@@ -886,7 +913,8 @@ nmap <leader>p :CtrlP<cr>
 " Easy bindings for its various modes
 nmap <leader>bb :CtrlPBuffer<cr>
 nmap <leader>bm :CtrlPMixed<cr>
-"nmap <leader>bs :CtrlPMRU<cr>
+nmap <leader>bs :CtrlPMRU<cr>
+let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:20'
 " ***************************************************
 "           scrooloose/nerdtree
 " ***************************************************
@@ -977,7 +1005,7 @@ let g:DoxygenToolkit_blockFooter="----------------------------------------------
 "           vim-scripts/mru.vim
 " ***************************************************
 "nnoremap <leader>mr :Mru<cr>
-nnoremap <leader>bs :Mru<cr>
+"nnoremap <leader>bs :Mru<cr>
 let MRU_Auto_Close = 1
 
 " ***************************************************
@@ -1113,3 +1141,8 @@ endf
 "command! -nargs=* Make tabnew | let $mkpath = SetMkfile() | make <args> -C $mkpath | cwindow 10
 command! -nargs=* Make let $mkpath = SetMkfile() | make <args> -C $mkpath | cwindow 10
 
+" ***************************************************
+"       terryma/vim-smooth-scroll
+" ***************************************************
+noremap <silent> <c-u> :call smooth_scroll#up(&scroll, 0, 2)<CR>
+noremap <silent> <c-d> :call smooth_scroll#down(&scroll, 0, 2)<CR>
